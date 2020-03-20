@@ -13,7 +13,7 @@ Install dependencies as needed.
 Run the code in bash (or anaconda prompt) 
 
 ``` bash
-python process_radiography_pchao.py path/to/example/folder
+python process_radiography_pchao.py path/to/example_data
 ```
 
 # Help
@@ -24,5 +24,5 @@ python process_radiography_pchao.py -h
 
 e.g.
 ```bash
-python process_radiography_pchao.py path/to/example/folder -vv --start 1000 --end 2000 --inc 5 --medfilt 2
+python process_radiography_pchao.py path/to/example_data -vv --start 1000 --end 2000 --inc 5 --medfilt 2
 ```
