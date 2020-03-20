@@ -17,7 +17,10 @@ python process_radiography_pchao.py path/to/example/folder
 ```
 
 # Help
-To play with the different processing parameters, please see -h for details
+To play with the different processing parameters, please see -h for details by running
+```bash
+python process_radiography_pchao.py -h
+```
 
 e.g.
 ```bash
