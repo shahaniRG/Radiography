@@ -51,7 +51,7 @@ parser.add_argument("--file_extension", action='store', default='.tif',
                     help="File extension. Default .tif")
 parser.add_argument("--fps", action='store',type=int, default=5,
                     help="Frames per second. Default 200ms exposure (5 fps)")
-parser.add_argument("--type", action='store', default='c',
+parser.add_argument("--mode", action='store', default='c',
                     help="Continious or sequential method")
 parser.add_argument("--save", action='store_true', default=True,
                     help="Save files to new directory /path_type_start_end_increment")
@@ -158,7 +158,7 @@ tracker = np.zeros(num_files//file_inc)
 print('\n**** We will process ' + str((end_frame-start_frame)//file_inc) + ' radiographs')
 
 # Calculate background is continious
-if args.type == 'c':
+if args.mode == 'c':
     print('\n*** in continious mode')
     print('\n*** calculating background from first image')
     selected_filename = filename + str(start_frame).zfill(padding) + args.file_extension
@@ -174,7 +174,7 @@ if args.type == 'c':
 if(args.save):
     current_folder = os.path.dirname(folder_path)
     basename = os.path.basename(folder_path)
-    folder_name = basename + '_' + args.type + '_medfilt' + str(args.medfilt) + '_inc' + str(file_inc) + '_start' + str(start_frame) + '_end' + str(end_frame)
+    folder_name = basename + '_' + args.mode + '_medfilt' + str(args.medfilt) + '_inc' + str(file_inc) + '_start' + str(start_frame) + '_end' + str(end_frame)
     save_folder = os.path.join(current_folder, folder_name)
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
@@ -186,7 +186,7 @@ print('\n**** Dividing the {} projections from the first projection: \n'.format(
 
 
 
-if args.type == 'c': #Continious
+if args.mode == 'c': #Continious
     track_count = 0
     print_status = True
     for val in range(start_frame, end_frame, file_inc): #range(start, stop. step)
@@ -208,7 +208,7 @@ if args.type == 'c': #Continious
       # Save results
       if(args.save):
         img_save = Image.fromarray(img_diff)
-        img_save.save(save_folder + '/' + filename + '_mode_' + args.type + '_' + str(val) + '.tiff', 'tiff')
+        img_save.save(save_folder + '/' + filename + 'mode_' + args.mode + '_' + str(val) + '.tiff', 'tiff')
       #print('* saved image #: ' + str(val-file_start))
 
       if args.verbosity >= 2:
@@ -229,7 +229,7 @@ if args.type == 'c': #Continious
 
       track_count = track_count+1
       
-elif args.type == 's': #Sequential
+elif args.mode == 's': #Sequential
     track_count = 0
     print_status = True
     for val in range(start_frame+file_inc, end_frame, file_inc): #range(start, stop. step)
@@ -257,7 +257,7 @@ elif args.type == 's': #Sequential
       # Save results
       if(args.save):
         img_save = Image.fromarray(img_diff)
-        img_save.save(save_folder + '/' + filename + 'mode_' + args.type + '_' + str(val) + '.tiff', 'tiff')
+        img_save.save(save_folder + '/' + filename + 'mode_' + args.mode + '_' + str(val) + '.tiff', 'tiff')
       #print('* saved image #: ' + str(val-file_start))
 
       if args.verbosity >= 2:
