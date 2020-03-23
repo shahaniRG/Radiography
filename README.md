@@ -36,8 +36,8 @@ Adding the flags:
 --type c
 --type s
 ```
-Continous will use the **first** frame as the background that will be divided by the remaining frames.
-Sequential will use the **previous** frame as the background that will be divided by the remaininng frames.
+- Continous will use the **first** frame as the background that will be divided by the remaining frames.
+- Sequential will use the **previous** frame as the background that will be divided by the remaininng frames.
 
 Specify the number of frames bewteen sequential with the increment frames flag
 ```
