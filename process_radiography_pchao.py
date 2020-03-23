@@ -257,7 +257,7 @@ elif args.type == 's': #Sequential
       # Save results
       if(args.save):
         img_save = Image.fromarray(img_diff)
-        img_save.save(save_folder + '/' + filename + '_mode_' + args.type + '_' + str(val) + '.tiff', 'tiff')
+        img_save.save(save_folder + '/' + filename + 'mode_' + args.type + '_' + str(val) + '.tiff', 'tiff')
       #print('* saved image #: ' + str(val-file_start))
 
       if args.verbosity >= 2:
