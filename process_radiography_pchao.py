@@ -7,10 +7,6 @@
 # Optionally, change the number of projections to increment, and the file start number (default, should be saved as 0)
 # See Al-Cu Example
 #
-#
-# Use as so:
-# python process_radiography.py /path/to/file
-#
 # -h result:
 #   -v verbose
 #   -vv extra verbose
@@ -40,7 +36,7 @@ import argparse
 
 
 parser = argparse.ArgumentParser(description='Quick python script to process radiography data',
-     epilog="\n thanks for using! Email me at pchao@umich.edu if there are issues or bugs!")
+     epilog="\n Thanks for using! Email me at pchao@umich.edu if there are issues or bugs!")
 
 
 parser.add_argument("path", help="folder path containing tiffs")
@@ -48,40 +44,34 @@ group = parser.add_mutually_exclusive_group()
 #group.add_argument("-v", "--verbose", action="store_true")
 group.add_argument("-q", "--quiet", action="store_true")
 group.add_argument("-v", "--verbosity", action="count",  default=0,
-                    help="increase output verbosity")
+                    help="Increase output verbosity. -v for simple. -vv for progress bar.")
 parser.add_argument("--delimiter", action='store', default='_',
-                    help="file name delimiter")
+                    help="File name delimiter. Default _")
 parser.add_argument("--file_extension", action='store', default='.tif',
-                    help="file extension (tiff)")
+                    help="File extension. Default .tif")
 parser.add_argument("--fps", action='store',type=int, default=5,
-                    help="Frames per second, default 200ms exposure (5 fps)")
+                    help="Frames per second. Default 200ms exposure (5 fps)")
 parser.add_argument("--type", action='store', default='c',
                     help="Continious or sequential method")
 parser.add_argument("--save", action='store_true', default=True,
                     help="Save files to new directory /path_type_start_end_increment")
-parser.add_argument("--overwrite", action='store_true',default=False,
-                    help="Don't overwrite if already exists")
+#parser.add_argument("--overwrite", action='store_true',default=False,
+#                    help="Don't overwrite if already exists")
 parser.add_argument("--start_frame", action='store',type=int, default=argparse.SUPPRESS,
                     help="The start frame, will default to be the first file in folder")
 parser.add_argument("--end_frame", action='store',type=int, default=argparse.SUPPRESS,
                     help="The end frame, will default to be the last file in the folder")
 parser.add_argument("--increment_frame", action='store',type=int, default=100,
-                    help="Frames per second, default 200ms exposure (5 fps)")
+                    help="Number of frames to increment by. Default 100 frames.")
 parser.add_argument("--time", action='store_true', default=True,
-                    help="Time how long it runs for")
+                    help="Time how long the program runs. Default True.")
 parser.add_argument("--track", action='store_true',default=False,
-                    help="Track intensity from each radiograph")
+                    help="Track intensity from each radiograph. Default False.")
 parser.add_argument("--medfilt", action='store',type=int, default=1,
-                    help="Size of median filter kernal")
+                    help="Size of median filter kernal. Default 1 (not used).")
 args = parser.parse_args()
 
-#debug
-#print(args)
-
-# ---------
-# Variable declaration
 folder_path = args.path
-
 
 # ----
 # Check validity of inputs
@@ -158,8 +148,6 @@ print('\n**** Incrementing by: ' + str(args.increment_frame) + ' projections')
 
 not_filename_len = padding + len(args.file_extension)
 filename = first_file[:-not_filename_len]
-
-#frames_path_root = folder_path + '/' + filename + '_'
 
 file_inc = args.increment_frame
 
@@ -240,6 +228,7 @@ if args.type == 'c': #Continious
             print_status = False
 
       track_count = track_count+1
+      
 elif args.type == 's': #Sequential
     track_count = 0
     print_status = True
