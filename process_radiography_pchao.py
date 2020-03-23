@@ -108,7 +108,7 @@ if lf_val-ff_val != num_files-1:
     sys.exit()
 
 # set defaults for start or end frame as first and last file
-if hasattr(args, 'first_frame'):
+if hasattr(args, 'start_frame'):
     start_frame = args.start_frame
 else:
     start_frame = ff_val
@@ -213,7 +213,7 @@ if args.mode == 'c': #Continious
 
       if args.verbosity >= 2:
           # Update Progress Bar
-          percent = double(val-file_start) / double(num_files)
+          percent = float(val-start_frame) / float(num_files)
           hashes = '#' * int(round(percent * bar_length))
           spaces = '-' * (bar_length - len(hashes))
           sys.stdout.write("\rCompleted: [{0}] {1}%".format(hashes + spaces, int(round(percent * 100))))
@@ -262,7 +262,7 @@ elif args.mode == 's': #Sequential
 
       if args.verbosity >= 2:
           # Update Progress Bar
-          percent = double(val-file_start) / double(num_files)
+          percent = float(val-start_frame) / float(num_files)
           hashes = '#' * int(round(percent * bar_length))
           spaces = '-' * (bar_length - len(hashes))
           sys.stdout.write("\rCompleted: [{0}] {1}%".format(hashes + spaces, int(round(percent * 100))))
