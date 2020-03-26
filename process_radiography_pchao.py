@@ -102,7 +102,7 @@ lf_val = int(lf_res[0])
 
 #Check Math
 # Do the number of files match last file-first file
-if lf_val-ff_val != num_files-1:
+if lf_val-ff_val != num_files:
     print('Hey, something is wrong with the number of files')
     print('num files: {} -- start file: {} -- end file: {}'.format(num_files,ff_val,lf_val))
     sys.exit()
@@ -182,7 +182,7 @@ if(args.save):
         print('WARNING: Directory already exists')
 
 # Execute Division
-print('\n**** Dividing the {} projections from the first projection: \n'.format(int(num_files//file_inc)) )
+#print('\n**** Dividing the {} projections from the first projection: \n'.format(int(num_files//file_inc)) )
 
 
 
