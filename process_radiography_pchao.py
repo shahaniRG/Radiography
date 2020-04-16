@@ -11,7 +11,7 @@
 #   -v verbose
 #   -vv extra verbose
 #   -q quiet
-#   --fps integer, frames per second, default=5
+#   --seq_frm
 #   --type c,s continious or sequential
 #   --save boolean, default=True
 #   --overwrite boolean, default=False
@@ -49,10 +49,10 @@ parser.add_argument("--delimiter", action='store', default='_',
                     help="File name delimiter. Default _")
 parser.add_argument("--file_extension", action='store', default='.tif',
                     help="File extension. Default .tif")
-parser.add_argument("--fps", action='store',type=int, default=5,
-                    help="Frames per second. Default 200ms exposure (5 fps)")
+parser.add_argument("--seq_frames", action='store',type=int, default=5,
+                    help="During sequential method, the number of frames it will divide by")
 parser.add_argument("--mode", action='store', default='c',
-                    help="Continious or sequential method")
+                    help="Continious (c) or sequential (s) method")
 parser.add_argument("--save", action='store_true', default=True,
                     help="Save files to new directory /path_type_start_end_increment")
 #parser.add_argument("--overwrite", action='store_true',default=False,
@@ -142,8 +142,6 @@ if timeme:
 # Import files
 print('\n**** Opening: ' + folder_path)
 
-print('\n**** Frames per second: ' + str(args.fps))
-
 print('\n**** Incrementing by: ' + str(args.increment_frame) + ' projections')
 
 not_filename_len = padding + len(args.file_extension)
@@ -175,6 +173,8 @@ if(args.save):
     current_folder = os.path.dirname(folder_path)
     basename = os.path.basename(folder_path)
     folder_name = basename + '_' + args.mode + '_medfilt' + str(args.medfilt) + '_inc' + str(file_inc) + '_start' + str(start_frame) + '_end' + str(end_frame)
+    if args.mode == 's':
+        folder_name = folder_name + '_seq_inc' + str(args.seq_frames)
     save_folder = os.path.join(current_folder, folder_name)
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
@@ -230,11 +230,12 @@ if args.mode == 'c': #Continious
       track_count = track_count+1
       
 elif args.mode == 's': #Sequential
+    seq_inc = args.seq_frames
     track_count = 0
     print_status = True
-    for val in range(start_frame+file_inc, end_frame, file_inc): #range(start, stop. step)
-      # Divide first file from all the other files
-      p_img_filename = filename + str(val-file_inc).zfill(padding) + args.file_extension
+    for val in range(start_frame+file_inc+seq_inc, end_frame, file_inc): #range(start, stop. step)
+      # Divide (c)urrent file from (p)revious file
+      p_img_filename = filename + str(val-seq_inc).zfill(padding) + args.file_extension
       p_file_path = os.path.join(folder_path, p_img_filename)
       p_img = Image.open(p_file_path)
       prev_img = np.array(p_img, dtype=np.double)
