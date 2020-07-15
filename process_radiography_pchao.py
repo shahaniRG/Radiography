@@ -1,25 +1,15 @@
 # Code free for public use, just acknowledge use
 # Paul Chao, pchao@umich.edu
-# March 18, 2020
+# Updated July 15,, 2020
 # Data obtained at APS 2ID-BM
 # Data type: tiff stack
 # Quick look at radiography data. Use by providing path to the folder, folder name and number of files in folder
 # Optionally, change the number of projections to increment, and the file start number (default, should be saved as 0)
-# See Al-Cu Example
-#
-# -h result:
-#   -v verbose
-#   -vv extra verbose
-#   -q quiet
-#   --seq_frm
-#   --type c,s continious or sequential
-#   --save boolean, default=True
-#   --overwrite boolean, default=False
-#   --increment, integer, default=50 (every ten seconds)
-#   --start_frame, integer, default=0 (or first file)
-#   --end_frame, integer, default=num_files
-#   --time, boolean, default=True
-#   --track, boolean, default=False, track radiography intensity
+# Try Al-Cu Example
+# cd to/folder/like/GitHub/Radiography
+# python process_radiography_pchao.py example_data -vv --mode c --inc 5 --start 1000 --end 2000  --medfilt 2
+# python process_radiography_pchao.py example_data -vv --mode s --inc 5 --seq_fram 10 --start 1000 --end 2000  --medfilt 2
+# 
 
 from __future__ import print_function
 import numpy as np
@@ -50,11 +40,13 @@ parser.add_argument("--delimiter", action='store', default='_',
 parser.add_argument("--file_extension", action='store', default='.tif',
                     help="File extension. Default .tif")
 parser.add_argument("--seq_frames", action='store',type=int, default=5,
-                    help="During sequential method, the number of frames it will divide by")
+                    help="During sequential method, the kth frame prior. For frame_n, the result will be frame_n/frame_n-k")
 parser.add_argument("--mode", action='store', default='c',
                     help="Continious (c) or sequential (s) method")
 parser.add_argument("--save", action='store_true', default=True,
-                    help="Save files to new directory /path_type_start_end_increment")
+                    help="Save files? default, yes of course!")
+parser.add_argument("--spath", action='store', default='',
+                    help="Save directory output format: /path_type_start_end_increment")
 #parser.add_argument("--overwrite", action='store_true',default=False,
 #                    help="Don't overwrite if already exists")
 parser.add_argument("--start_frame", action='store',type=int, default=argparse.SUPPRESS,
@@ -62,7 +54,7 @@ parser.add_argument("--start_frame", action='store',type=int, default=argparse.S
 parser.add_argument("--end_frame", action='store',type=int, default=argparse.SUPPRESS,
                     help="The end frame, will default to be the last file in the folder")
 parser.add_argument("--increment_frame", action='store',type=int, default=100,
-                    help="Number of frames to increment by. Default 100 frames.")
+                    help="Number of frames to increment by. Defines which frames will be processed. frames_n, process for each frame_n+increment. Default 100 frames.")
 parser.add_argument("--time", action='store_true', default=True,
                     help="Time how long the program runs. Default True.")
 parser.add_argument("--track", action='store_true',default=False,
@@ -153,24 +145,14 @@ file_inc = args.increment_frame
 bar_length = 50
 tracker = np.zeros(num_files//file_inc)
 
-print('\n**** We will process ' + str((end_frame-start_frame)//file_inc) + ' radiographs')
-
-# Calculate background is continious
-if args.mode == 'c':
-    print('\n*** in continious mode')
-    print('\n*** calculating background from first image')
-    selected_filename = filename + str(start_frame).zfill(padding) + args.file_extension
-    im_path = os.path.join(folder_path, selected_filename)
-    temp_img = Image.open(im_path)
-    bkg_img = np.array(temp_img, dtype=np.double)
-    if(args.medfilt > 1):
-        bkg_img = ndimage.median_filter(bkg_img, args.medfilt)
-
 
 
 # Make save directory
 if(args.save):
-    current_folder = os.path.dirname(folder_path)
+    if(len(args.spath) > 0):
+        current_folder = args.spath
+    else:
+        current_folder = os.path.dirname(folder_path)
     basename = os.path.basename(folder_path)
     folder_name = basename + '_' + args.mode + '_medfilt' + str(args.medfilt) + '_inc' + str(file_inc) + '_start' + str(start_frame) + '_end' + str(end_frame)
     if args.mode == 's':
@@ -187,9 +169,21 @@ if(args.save):
 
 
 if args.mode == 'c': #Continious
+    print('\n**** Continious mode!')
+    print('\n**** We will process ' + str((end_frame-start_frame)//file_inc) + ' radiographs')
+    # Calculate background
+    print('\n*** in continious mode')
+    print('\n*** calculating background from first image')
+    selected_filename = filename + str(start_frame).zfill(padding) + args.file_extension
+    im_path = os.path.join(folder_path, selected_filename)
+    temp_img = Image.open(im_path)
+    bkg_img = np.array(temp_img, dtype=np.double)
+    if(args.medfilt > 1):
+        bkg_img = ndimage.median_filter(bkg_img, args.medfilt)
+
     track_count = 0
     print_status = True
-    for val in range(start_frame, end_frame, file_inc): #range(start, stop. step)
+    for val in range(start_frame+file_inc, end_frame, file_inc): #range(start, stop. step)
       # Divide first file from all the other files
       img_filename = filename + str(val).zfill(padding) + args.file_extension
       file_path = os.path.join(folder_path, img_filename)
@@ -208,7 +202,7 @@ if args.mode == 'c': #Continious
       # Save results
       if(args.save):
         img_save = Image.fromarray(img_diff)
-        img_save.save(save_folder + '/' + filename + 'mode_' + args.mode + '_' + str(val) + '.tiff', 'tiff')
+        img_save.save(save_folder + '/' + filename + 'mode_' + args.mode + '_' + str(val) + '.tif', 'tiff')
       #print('* saved image #: ' + str(val-file_start))
 
       if args.verbosity >= 2:
@@ -230,6 +224,8 @@ if args.mode == 'c': #Continious
       track_count = track_count+1
       
 elif args.mode == 's': #Sequential
+    print('\n**** Sequential mode!')
+    print('\n**** We will process ' + str((end_frame-start_frame)//file_inc) + ' radiographs with a sequential increment of ' + str(seq_inc))
     seq_inc = args.seq_frames
     track_count = 0
     print_status = True
@@ -258,7 +254,7 @@ elif args.mode == 's': #Sequential
       # Save results
       if(args.save):
         img_save = Image.fromarray(img_diff)
-        img_save.save(save_folder + '/' + filename + 'mode_' + args.mode + '_' + str(val) + '.tiff', 'tiff')
+        img_save.save(save_folder + '/' + filename + 'mode_' + args.mode + '_' + str(val) + '.tif', 'tiff')
       #print('* saved image #: ' + str(val-file_start))
 
       if args.verbosity >= 2:
@@ -278,8 +274,9 @@ elif args.mode == 's': #Sequential
             print_status = False
 
       track_count = track_count+1
+
 else:
-    print('ERROR: Please choose either c for continious or s for sequential processing')
+    print('ERROR: Please use the --mode flag to choose either c for continious or s for sequential normalization')
 
 if timeme:
     end  = time.time()
