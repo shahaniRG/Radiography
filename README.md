@@ -3,6 +3,9 @@ Codes relating to x-ray radiography post processing algorithms.
 
 The raw data we obtain contain detector artifact that obscure the event occuring. The first step when analyzing the results is to normalize the images. Normalizing refers to an image division operation that takes two raw images and produces and normalized image. There are 2 main ways which we call Continious and Sequential. I would suggest using the continious mode first on the entirety of the dataset to get a general sense of the quality of the data. Use Sequential to better analyze interpret results. 
 
+More more details, see:
+Tandjaoui, A., Mangelinck-Noel, N., Reinhart, G., Billia, B. & Guichard, X. Twinning occurrence and grain competition in multi-crystalline silicon during solidification. Comptes Rendus Physique 14, 141–148 (2013).
+
 
 # How to get started
 Begin by downloading the python script and the folder of example files
